@@ -16,28 +16,55 @@
       (setq undo-tree-history-directory-alist `(("." . ,backup-file-dir)))
       (setq undo-tree-auto-save-history nil))))
 
+;(use-package evil-leader
+;  :ensure t
+;  :init
+;  (global-evil-leader-mode))
+
 ;; Load evil
 (use-package evil
+         ;:after evil-leader
 	     :ensure t
 	     :defer nil
+         :init
+         (progn
+           (setq evil-want-integration t)
+           (setq evil-want-keybinding nil))
+         ; hack to stop evil-collection from complaining
 	     :config
-	     (evil-mode 1)
-	     (evil-set-undo-system 'undo-tree))
+         (progn
+           (evil-mode 1)
+           (evil-set-undo-system 'undo-tree)))
 
 (use-package company
   :ensure t
   :config (global-company-mode))
+
+(use-package magit
+  :ensure t)
+
+(use-package evil-collection
+  :after magit
+  :ensure t
+  :config
+  (evil-collection-init))
 
 ;(use-package corfu
 ;  :ensure t
 ;  :custom
 ;  (corfu-auto t))
 
-(use-package lsp-mode :ensure t)
-
 (use-package dired
   :config
   (define-key dired-mode-map [mouse-2] 'dired-mouse-find-file))
+
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (or (memq window-system '(mac ns x)) (daemonp))
+    (exec-path-from-shell-initialize)))
+
+(use-package eglot :ensure t)
 
 (use-package ada-mode :ensure t)
 (use-package elixir-mode :ensure t)
@@ -47,8 +74,8 @@
 
 (setq ring-bell-function 'ignore)
 
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
+;(setq-default indent-tabs-mode nil)
+;(setq-default tab-width 4)
 ;(setq-default electric-indent-inhibit t)
 
 ; Stop Dired from spamming new buffers
@@ -60,3 +87,10 @@
 (setq-default show-trailing-whitespace t)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (add-hook 'shell-mode-hook 'disable-paren-highlight)
+
+(electric-pair-mode t)
+
+(add-hook 'js-mode-hook
+  (lambda ()
+    (make-local-variable 'js-indent-level)
+    (setq js-indent-level 2)))
